@@ -260,5 +260,143 @@ SELECT LAST_DAY(SYSDATE) FROM DUAL;
 
 
 -- 직원명, 입사일, 입사한 월의 마지막 날짜, 입사한 월에 근무한 일수 조회
-SELECT EMP_NAME, HIRE_DATE ,LAST_DAY(HIRE_DATE), LAST_DAY(HIRE_DATE) - HIRE_DATE
+SELECT EMP_NAME, HIRE_DATE ,LAST_DAY(HIRE_DATE), LAST_DAY(HIRE_DATE) - HIRE_DATE +1 근무일 
 FROM EMPLOYEE;
+
+/*
+    EXTRACT(YEAR|MONTH|DAY FROM DATE)
+    - 특정 날짜에서 연도, 월, 일 정보를 추출해서 반환
+      YEAR : 연도만 추출
+      MONTH : 월만 추출
+      DAY : 일만 추출
+*/
+-- 직원명, 입사년도, 입사월, 입사일 조회
+SELECT EMP_NAME, EXTRACT(YEAR FROM HIRE_DATE )"입사 년도", EXTRACT(MONTH FROM HIRE_DATE) "입사 월" ,EXTRACT(DAY FROM HIRE_DATE)입사일
+FROM EMPLOYEE
+ORDER BY 2, 3 ASC, 4 ASC;
+
+/*
+    형 변환 
+    TO_CHAR(날짜|숫자, [포맷])
+    - 날짜 또는 숫자형 데이터를 문자 타입으로 변환해서 반환
+*/
+SELECT TO_CHAR(1234, 'L999999') FROM DUAL; -- 현재 설정된 나라의 화폐단위
+SELECT TO_CHAR(1234, '$999999') FROM DUAL;
+SELECT TO_CHAR(1234, 'L99') FROM DUAL; -- 포맷 자리수가 안맞아서
+SELECT TO_CHAR(12345678, 'L999,999,999') FROM DUAL;
+
+-- 직원명, 급여, 연봉 (위의 TO_CHAR를 이용해서) 조회
+SELECT EMP_NAME 직원명, TO_CHAR(SALARY, 'L999,999,999') 급여 , TO_CHAR(SALARY * 12, 'L999,999,999') 연봉 ,
+FROM EMPLOYEE
+ORDER BY "연봉"; 
+
+-- 날짜 -> 문자
+SELECT TO_CHAR(SYSDATE, 'PM HH:MI:SS') FROM DUAL;
+SELECT TO_CHAR(SYSDATE, 'AM HH24:MI:SS') FROM DUAL;
+-- DY, DAY : 요일 / DD : 일
+SELECT TO_CHAR(SYSDATE, 'MON DD"일", DY, YYYY') FROM DUAL;
+
+-- 년도와 관련된 포맷
+SELECT 
+    TO_CHAR(SYSDATE, 'YYYY'),
+    TO_CHAR(SYSDATE, 'YY'),
+    TO_CHAR(SYSDATE, 'RRRR'),
+    TO_CHAR(SYSDATE, 'RR'),
+    TO_CHAR(SYSDATE, 'YEAR')
+FROM DUAL;
+
+-- 월과 관련된 포맷
+SELECT
+    TO_CHAR(SYSDATE, 'MM'),
+    TO_CHAR(SYSDATE, 'MON'),
+    TO_CHAR(SYSDATE, 'MONTH'),
+    TO_CHAR(SYSDATE, 'RM') -- 로마기호
+FROM DUAL;
+
+-- 일과 관련된 포맷 
+SELECT
+    TO_CHAR(SYSDATE, 'D'), -- 주 기준
+    TO_CHAR(SYSDATE, 'DD'), -- 월 기준
+    TO_CHAR(SYSDATE, 'DDD') -- 년 기준 
+FROM DUAL;
+
+-- 요일과 관련된 포맷
+SELECT
+    TO_CHAR(SYSDATE, 'DAY'),
+    TO_CHAR(SYSDATE, 'DY')
+FROM DUAL;
+
+-- 직원명, 입사일 조회
+-- 단, 입사일은 포맷을 지정해서 조회! EX) 2023년 06월 21일 (수)
+
+SELECT
+    EMP_NAME 직원명, TO_CHAR(HIRE_DATE, 'YYYY"년 "MM"월 "DD"일 " (DY)') 입사일 
+FROM EMPLOYEE
+ORDER BY 입사일; 
+
+/*
+    TO_DATE(숫자|문자, [포맷])
+    - 숫자 또는 문자형 데이터를 날짜 타입으로 변환해서 반환 
+    
+*/
+-- 숫자 --> 날짜
+SELECT TO_DATE(20230621) FROM DUAL;
+SELECT TO_DATE(20230621153410) FROM DUAL; -- 에러
+SELECT TO_DATE(20230621153410, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL; 
+
+-- 문자 -> 날짜
+SELECT TO_DATE('20230621', 'YYYYMMDD') FROM DUAL;
+SELECT TO_DATE('20230621 033823', 'YYYYMMDD HH24MISS') FROM DUAL;
+
+
+/*
+    TO_NUMBER('문자값', [포맷])
+    - 문자형 데이터를 숫자 타입으로 변환해서 반환
+*/
+SELECT '1000000' + '550000' FROM DUAL;
+SELECT '1,000,000' + '550,000' FROM DUAL; -- 에러
+SELECT TO_NUMBER('1,000,000', '9,999,999')+ TO_NUMBER('550,000', '999,999') 합 FROM DUAL;
+
+/*
+    NULL 처리 함수
+    
+    NVL(값1, 값2)
+    - 값1이 NULL이 아니면 값1을 반환하고 값1이 NULL이면 값2를 반환
+*/
+-- 사원명, 보너스 조회
+SELECT 
+    EMP_NAME,
+    NVL(BONUS, 0)
+FROM EMPLOYEE;
+
+-- 사원명, 보너스포함 연봉 = (월급 +월급*보너스) *12 조회
+SELECT 
+    EMP_NAME,
+    NVL(((SALARY+(SALARY*BONUS))*12), SALARY*12) 
+FROM EMPLOYEE
+ORDER BY 2 DESC;
+
+-- 사원명, 부서코드 조회 (부서코드가 NULL이면 "부서없음") 조회
+SELECT
+    EMP_NAME, 
+    NVL(DEPT_CODE, '부서없음') 
+FROM EMPLOYEE
+ORDER BY 2;
+
+/*
+    NVL2(값1, 값2, 값3)
+    - 값1이 NULL이 아니면 값2를 반환하고 값1이 NULL이면 값3를 반환
+*/
+-- 사원명, 부서코드가 있는 경우 "부서있음", 없는 경우는 "부서없음" 
+SELECT
+    EMP_NAME,
+    NVL2(DEPT_CODE, '부서있음', '부서없음')
+FROM EMPLOYEE;
+
+/*
+    NULLIF(값1, 값2)
+    - 두 개의 값이 동일하면 NULL을 반환하고,
+      두 개의 값이 동일하지 않으면 값1을 반환
+*/
+SELECT NULLIF('123', '123') FROM DUAL;
+SELECT NULLIF('123', '456') FROM DUAL; //
