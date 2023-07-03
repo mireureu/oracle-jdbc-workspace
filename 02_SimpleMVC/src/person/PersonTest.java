@@ -69,19 +69,43 @@ public class PersonTest {
 			int result = st.executeUpdate();
 			
 			System.out.println(result + " 명 삭제");
-		
+			
+			closeAll(conn, st);
+			
 	}
 		
 	
-	public void updatePerson(int id, String address) {
+	public void updatePerson(int id, String address) throws SQLException {
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("updatePerson"));
+		st.setString(1, address);
+		st.setInt(2, id);
 		
+		int result = st.executeUpdate();
+		System.out.println(result + "명 수정!");
+		
+		closeAll(conn, st);
 	}
 	
-	public void searchAllPerson() {
+	public void searchAllPerson() throws SQLException {
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("searchAllPerson"));
+		ResultSet rs = st.executeQuery();
 		
+		while(rs.next()) {
+			System.out.println(rs.getString("name") + "," + rs.getString("address")); 
+		}
 	}
 	
-	public void viewPerson(int id) {
+	public void viewPerson(int id) throws SQLException {
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("viewPerson"));
+		st.setInt(1, id);
+		
+		ResultSet rs = st.executeQuery();
+		if(rs.next()) {
+			System.out.println(rs.getString("name") + "," + rs.getString("address"));
+		}
 		
 	}
 	
@@ -113,5 +137,9 @@ public class PersonTest {
 	
 
 	}
+	// set은 물음표있을때마다 한개씩써야함 두개나오면 두개 세개나오면 세개
+	// 셀렉트는 executeQuery
+	// 수정은 executeUpdate
+	
 
 }
