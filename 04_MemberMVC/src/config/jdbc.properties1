@@ -1,0 +1,7 @@
+jdbc.sql.delete = DELETE FROM MEMBER WHERE id=?
+searchAllPerson = SELECT * FROM MEMBER
+registerMember = INSERT INTO MEMBER(id, password, name) VALUES(?, ?, ?)
+updatePassword = UPDATE MEMBER SET PASSWORD=? WHERE id=?
+updateName = UPDATE MEMBER SET name=? WHERE id=?
+getMember = SELECT * FROM member WHERE id=?
+login = SELECT * FROM member WHERE id=? and password=?

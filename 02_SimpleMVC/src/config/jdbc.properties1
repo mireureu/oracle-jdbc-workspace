@@ -1,5 +1,3 @@
 jdbc.sql.delete = DELETE FROM PERSON WHERE id=?
 searchAllPerson = SELECT * FROM PERSON
-jdbc.sql.insert = INSERT INTO person(id, name, address) VALUES(SEQ_PERSON.NEXTVAL, ?, ?)
-updatePerson = UPDATE person SET address=? WHERE id=?
-viewPerson = SELECT name, address FROM person WHERE id=?
+registerMember = INSERT INTO person(id, name, address) VALUES(SEQ_PERSON.NEXTVAL, ?, ?)
