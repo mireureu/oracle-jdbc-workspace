@@ -23,7 +23,19 @@ public class Member {
 		this.enrollDate = enrollDate;
 	}
 	public Member(String id, String password, String name) {
+		this.memberId = id;
+		this.memberPwd = password;
+		this.memberName = name;
 	}
+	public Member(String id, String password) {
+		this.memberId = id;
+		this.memberPwd = password;
+	}
+	public Member(int memberNo) {
+		// TODO Auto-generated constructor stub
+		this.memberNo = memberNo;
+	}
+
 	public int getMemberNo() {
 		return memberNo;
 	}

@@ -18,7 +18,6 @@ import com.kh.model.vo.Rent;
 import config.ServerInfo;
 
 public class BookDAO implements BookDAOTemplate{
-	private ArrayList<Book> test = new ArrayList<>();
 	private Properties p = new Properties();
 	
 	public BookDAO() {
@@ -35,8 +34,8 @@ public class BookDAO implements BookDAOTemplate{
 	
 	@Override
 	public Connection getConnect() throws SQLException {
-		Connection conn = DriverManager.getConnection(ServerInfo.URL,ServerInfo.USER,ServerInfo.PASSWORD);
-		return conn;
+		
+		return DriverManager.getConnection(ServerInfo.URL,ServerInfo.USER,ServerInfo.PASSWORD);
 	}
 
 	@Override
@@ -56,31 +55,28 @@ public class BookDAO implements BookDAOTemplate{
 		Connection conn = getConnect();
 		PreparedStatement st = conn.prepareStatement(p.getProperty("printBookAll"));
 		ResultSet rs = st.executeQuery();
-		System.out.println(rs.next());
+		ArrayList<Book> bookList = new ArrayList<>();
 		while(rs.next()) {
-			Book bk = new Book();
-			bk.setBkNo(rs.getInt("bk_no")); 
-			bk.setBkTitle(rs.getString("bk_title"));
-			bk.setBkAuthor(rs.getString("bk_author")); 
-			test.add(bk);
+			
+			bookList.add(new Book(rs.getInt("bk_no"),rs.getString("bk_title"),rs.getString("bk_author")));
 			 
 			}
 		
 		closeAll(rs, st, conn);
-		return test;
+		return bookList;
 	}
 
 	@Override
 	public int registerBook(Book book) throws SQLException {
 		Connection conn = getConnect();
 		PreparedStatement st = conn.prepareStatement(p.getProperty("registerBook"));
-		st.setInt(1, book.getBkNo());
-		st.setString(2, book.getBkTitle());
-		st.setString(3, book.getBkAuthor());
+		st.setString(1, book.getBkTitle());
+		st.setString(2, book.getBkAuthor());
 		
-		st.executeUpdate();
+		
+		int result = st.executeUpdate();
 		closeAll(st, conn);
-		return st.executeUpdate();
+		return result;
 	}
 
 	@Override
@@ -89,54 +85,104 @@ public class BookDAO implements BookDAOTemplate{
 		PreparedStatement st = conn.prepareStatement(p.getProperty("sellBook"));
 		st.setInt(1, no);
 		
-		st.executeUpdate();
+		int result = st.executeUpdate();
 		closeAll(st, conn);
-		return st.executeUpdate();
+		return result;
 		
 	}
 
 	@Override
 	public int registerMember(Member member) throws SQLException {
-		return 0;
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("registerMember"));
+		st.setString(1, member.getMemberId());
+		st.setString(2, member.getMemberPwd());
+		st.setString(3, member.getMemberName());
+		
+		int result = st.executeUpdate();
+		closeAll(st, conn);
+		return result;
 	}
 
 	@Override
 	public Member login(String id, String password) throws SQLException {
-		return null;
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("login"));
+		st.setString(1, id);
+		st.setString(2, password);
+		
+		ResultSet rs = st.executeQuery();
+		Member member = null;
+		
+		if(rs.next()) {
+			member = new Member();
+			member.setMemberNo(rs.getInt("member_no"));
+			member.setMemberId(rs.getString("member_id"));
+			member.setMemberPwd(rs.getString("member_pwd"));
+			member.setMemberName(rs.getString("member_name"));
+			member.setStatus(rs.getString("status").charAt(0));
+			member.setEnrollDate(rs.getDate("enroll_date"));  
+		}
+		
+		closeAll(rs ,st, conn);
+		return member;
 	}
 
 	@Override
 	public int deleteMember(String id, String password) throws SQLException {
-		return 0;
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("deleteMember"));
+		st.setString(1, id);
+		st.setString(2, password);
+
+		
+		int result = st.executeUpdate();
+		closeAll(st, conn);
+		return result;
 	}
 
 	@Override
 	public int rentBook(Rent rent) throws SQLException {
-		return 0;
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("rentBook"));
+		st.setInt(1, rent.getMember().getMemberNo());
+		st.setInt(2, rent.getBook().getBkNo());
+
+		
+		int result = st.executeUpdate();
+		closeAll(st, conn);
+		return result;
 	}
 
 	@Override
 	public int deleteRent(int no) throws SQLException {
-		return 0;
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("deleteRent"));
+		st.setInt(1, no);
+
+		
+		int result = st.executeUpdate();
+		closeAll(st, conn);
+		return result;
 	}
 
 	@Override
 	public ArrayList<Rent> printRentBook(String id) throws SQLException {
-		return null;
-	}
-public static void main(String[] args) {
-	BookDAO b = new BookDAO();
-	
-	try {
-		ArrayList<Book> test = b.printBookAll();
-		for (Book book : test) {
-			System.out.println(book.getBkNo());
-			System.out.println(book.getBkTitle());
-			System.out.print(book.getBkAuthor());
+		Connection conn = getConnect();
+		PreparedStatement st = conn.prepareStatement(p.getProperty("printRentBook"));
+		st.setString(1, id);
+		ResultSet rs = st.executeQuery();
+		ArrayList<Rent> rentList = new ArrayList<>();
+		while(rs.next()) {
+			Rent rent = new Rent();
+			rent.setRentNo(rs.getInt("rent_no"));
+			rent.setRentDate(rs.getDate("rent_date"));
+			rent.setBook(new Book(rs.getString("bk_title"), rs.getString("bk_author")));
+			
+			rentList.add(rent);
 		}
-		
-	} catch (SQLException e) {
-		e.printStackTrace();
+		closeAll(rs, st, conn);
+		return rentList;
 	}
-}
+
 }

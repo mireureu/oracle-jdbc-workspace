@@ -18,6 +18,11 @@ public class Rent {
 		this.book = book;
 		this.rentDate = rentDate;
 	}
+	public Rent(Member member, Book book) {
+		// TODO Auto-generated constructor stub
+		this.member = member;
+		this.book = book;
+	}
 	public int getRentNo() {
 		return rentNo;
 	}

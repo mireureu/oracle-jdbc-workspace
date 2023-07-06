@@ -9,6 +9,7 @@ public class Book {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
 	public Book(int bkNo, String bkTitle, String bkAuthor) {
 		super();
 		this.bkNo = bkNo;
@@ -16,7 +17,14 @@ public class Book {
 		this.bkAuthor = bkAuthor;
 	}
 	public Book(String title, String author) {
+		this.bkTitle = title;
+		this.bkAuthor = author;
 	}
+	public Book(int no) {
+		// TODO Auto-generated constructor stub
+		this.bkNo = no;
+	}
+
 	public int getBkNo() {
 		return bkNo;
 	}
